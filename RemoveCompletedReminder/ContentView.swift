@@ -18,14 +18,14 @@ struct ContentView: View {
             Divider()
             Button(action: {
                 let eventStore = EKEventStore()
-                let ekcal : [EKCalendar] = [eventStore.defaultCalendarForNewReminders()!]
-                let predForCompleted = eventStore.predicateForCompletedReminders(withCompletionDateStarting: nil, ending: nil, calendars: ekcal)
+                let defaultCalendar : [EKCalendar] = [eventStore.defaultCalendarForNewReminders()!]
+                let predForCompleted = eventStore.predicateForCompletedReminders(withCompletionDateStarting: nil, ending: nil, calendars: defaultCalendar)
                 eventStore.fetchReminders(matching: predForCompleted) { (reminders) in
                     reminderList = reminders!
                     
-                    for i in reminders!{
+                    for reminder in reminders!{
                         do{
-                            try eventStore.remove(i, commit: true)
+                            try eventStore.remove(reminder, commit: true)
                         }catch let error{
                             print(error)
                         }
