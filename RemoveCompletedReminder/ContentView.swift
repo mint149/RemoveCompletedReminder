@@ -10,13 +10,11 @@ import EventKit
 
 struct ContentView: View {
     @State var reminderAccess = "unknown"
-    @State var calendarAccess = "unknown"
     @State var reminderList: [EKReminder] = []
 
     var body: some View {
         VStack(alignment: .leading){
             Text("reminderAccess:\(reminderAccess)")
-            Text("calendarAccess:\(calendarAccess)")
             Divider()
             Button(action: {
                 let eventStore = EKEventStore()
@@ -40,7 +38,7 @@ struct ContentView: View {
             List{
                 ForEach(reminderList, id: \.calendarItemIdentifier){ reminder in
                     Text(reminder.title)
-                }.navigationTitle("削除したリマインダー")
+                }
             }
             Spacer()
         }
@@ -65,27 +63,6 @@ struct ContentView: View {
                 reminderAccess = "authorized"
             @unknown default:
                 reminderAccess = "unknown"
-            }
-
-            switch EKEventStore.authorizationStatus(for: EKEntityType.event){
-            case .notDetermined:
-                let eventStore = EKEventStore()
-                eventStore.requestAccess(to: .event) { (granted, error) in
-                    if granted{
-                        calendarAccess = "granted"
-                    }else{
-                        calendarAccess = "failed"
-                        print(error ?? "unknown error")
-                    }
-                }
-            case .restricted:
-                calendarAccess = "restricted"
-            case .denied:
-                calendarAccess = "denied"
-            case .authorized:
-                calendarAccess = "authorized"
-            @unknown default:
-                calendarAccess = "unknown"
             }
         }
     }

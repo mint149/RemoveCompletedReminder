@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCalendarsUsageDescription</key>
-	<string>&quot;カレンダーの操作&quot;</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>&quot;リマインダーの削除&quot;</string>
 	<key>CFBundleDevelopmentRegion</key>
