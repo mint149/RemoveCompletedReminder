@@ -6,11 +6,88 @@
 //
 
 import SwiftUI
+import EventKit
 
 struct ContentView: View {
+    @State var reminderAccess = "unknown"
+    @State var calendarAccess = "unknown"
+    @State var reminderList: [EKReminder] = []
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack(alignment: .leading){
+            Text("reminderAccess:\(reminderAccess)")
+            Text("calendarAccess:\(calendarAccess)")
+            Divider()
+            Button(action: {
+                let eventStore = EKEventStore()
+                let ekcal : [EKCalendar] = [eventStore.defaultCalendarForNewReminders()!]
+                let predForCompleted = eventStore.predicateForCompletedReminders(withCompletionDateStarting: nil, ending: nil, calendars: ekcal)
+                eventStore.fetchReminders(matching: predForCompleted) { (reminders) in
+                    reminderList = reminders!
+                    
+                    for i in reminders!{
+                        do{
+                            try eventStore.remove(i, commit: true)
+                        }catch let error{
+                            print(error)
+                        }
+                    }
+                }
+            }) {
+                Text("削除実行")
+            }
+            Divider()
+            List{
+                ForEach(reminderList, id: \.calendarItemIdentifier){ reminder in
+                    Text(reminder.title)
+                }.navigationTitle("削除したリマインダー")
+            }
+            Spacer()
+        }
+        .padding()
+        .onAppear(){
+            switch EKEventStore.authorizationStatus(for: EKEntityType.reminder){
+            case .notDetermined:
+                let eventStore = EKEventStore()
+                eventStore.requestAccess(to: .reminder) { (granted, error) in
+                    if granted{
+                        reminderAccess = "granted"
+                    }else{
+                        reminderAccess = "failed"
+                        print(error ?? "unknown error")
+                    }
+                }
+            case .restricted:
+                reminderAccess = "restricted"
+            case .denied:
+                reminderAccess = "denied"
+            case .authorized:
+                reminderAccess = "authorized"
+            @unknown default:
+                reminderAccess = "unknown"
+            }
+
+            switch EKEventStore.authorizationStatus(for: EKEntityType.event){
+            case .notDetermined:
+                let eventStore = EKEventStore()
+                eventStore.requestAccess(to: .event) { (granted, error) in
+                    if granted{
+                        calendarAccess = "granted"
+                    }else{
+                        calendarAccess = "failed"
+                        print(error ?? "unknown error")
+                    }
+                }
+            case .restricted:
+                calendarAccess = "restricted"
+            case .denied:
+                calendarAccess = "denied"
+            case .authorized:
+                calendarAccess = "authorized"
+            @unknown default:
+                calendarAccess = "unknown"
+            }
+        }
     }
 }
 
