@@ -35,7 +35,7 @@ struct ContentView: View {
                 Text("削除実行")
             }
             Divider()
-            List{
+            Section(header: Text("削除済みリマインダー")){
                 ForEach(reminderList, id: \.calendarItemIdentifier){ reminder in
                     Text(reminder.title)
                 }
